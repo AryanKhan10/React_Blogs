@@ -1,6 +1,7 @@
 import { createContext, useEffect, useState } from "react";
 import { BaseUrl } from '../BaseUrl';
 import axios from 'axios'
+import { Navigate, useNavigate } from "react-router-dom";
 
 //  context creation
 export const AppContext = createContext();
@@ -10,14 +11,22 @@ export default function AppContextProvider({children}){
     const [post, setPost] = useState([]);
     const [page, setPage] = useState(1);
     const [totalPage, setTotalPage] = useState(null);
-
-    const fetchData= async(page)=>{
+    const navigate = useNavigate();
+    const fetchData= async(page, tag, category)=>{
+        console.log(tag,category)
         setLoading(true);
-
         let url =`${BaseUrl}?page=${page}`
-        console.log(url)
+        if(tag){
+            url+=`&tag=${tag}`
+            console.log(url)
+        }
+        if(category){
+            url+=`&category=${category}`
+            console.log(url)
+        }
+        // console.log(url)
         const {data} = await axios.get(url)
-        console.log(data);
+        // console.log(data);
 
             setPost(data.posts)
             setPage(data.page)
@@ -36,11 +45,11 @@ export default function AppContextProvider({children}){
         setLoading(false);
 
     }
-    useEffect(()=>{
-        fetchData()
-    },[])
+
 
     const pageHandler=(page)=>{
+        // setPage(page)
+        navigate({search: `?page=${page}`})
         setPage(page)
         fetchData(page)
     }
